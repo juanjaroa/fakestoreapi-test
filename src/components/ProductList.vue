@@ -5,14 +5,41 @@
 
     <!-- Mostrar la lista de productos usando PrimeVue's DataTable -->
     <DataTable
+      v-model:filters="filters"
       :value="products"
       paginator
       :rows="5"
       :rowsPerPageOptions="[5, 10, 20]"
+      filterDisplay="menu"
+      :loading="loading"
+      :globalFilterFields="['title']"
     >
-      <!-- Definir las columnas del DataTable -->
-      <!-- <Column field="id" header="ID"></Column> -->
-      <Column field="title" header="Título"></Column>
+      <template #header>
+        <div class="flex justify-content-between">
+          <Button
+            type="button"
+            icon="pi pi-filter-slash"
+            label="Clear"
+            outlined
+            @click="clearFilter()"
+          ></Button>
+          <span class="p-input-icon-left">
+            <i class="pi pi-search"></i>
+            <InputText
+              v-model="filters['global'].value"
+              placeholder="Keyword Search"
+            />
+          </span>
+        </div>
+      </template>
+      <template #empty> No products found. </template>
+      <template #loading> Loading products data. Please wait. </template>
+      <Column
+        field="title"
+        header="Título"
+        :filter="true"
+        filterMatchMode="contains"
+      ></Column>
       <Column header="Image">
         <template #body="slotProps">
           <img
@@ -23,7 +50,7 @@
         </template>
       </Column>
       <Column field="price" header="Precio"></Column>
-      <Column field="category" header="Caategory"></Column>
+      <Column field="category" header="Categoría"></Column>
       <Column header="Acciones">
         <template #body="rowData">
           <Button @click="addToCart(rowData)">Agregar al Carrito</Button>
@@ -38,10 +65,20 @@ import { ref, onMounted } from "vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from "primevue/button";
-/* import InputText from "primevue/inputtext"; */
+import InputText from "primevue/inputtext";
+import { FilterMatchMode } from "primevue/api";
 
 // Definir el estado local para la lista de productos
 const products = ref([]);
+
+// Definir el estado local para los filtros
+const filters = ref({
+  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  title: { value: null, matchMode: FilterMatchMode.CONTAINS },
+});
+
+// Definir el estado local para la propiedad loading
+const loading = ref(true);
 
 // Función para agregar un producto al carrito
 const addToCart = (product) => {
@@ -64,8 +101,19 @@ onMounted(async () => {
     products.value = data;
   } catch (error) {
     console.error("Error al obtener datos de la API:", error.message);
+  } finally {
+    // Establecer loading en false después de que se complete la carga
+    loading.value = false;
   }
 });
+
+// Función para limpiar los filtros
+const clearFilter = () => {
+  filters.value = {
+    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
+    title: { value: null, matchMode: FilterMatchMode.CONTAINS },
+  };
+};
 </script>
 
 <style scoped>
