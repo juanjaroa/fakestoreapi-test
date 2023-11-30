@@ -5,16 +5,16 @@
 
     <!-- Mostrar la lista de productos usando PrimeVue's DataTable -->
     <DataTable
-      v-model:filters="filters"
+      :filters="filters"
+      @update:filters="updateFilters"
       :value="products"
       paginator
       :rows="5"
       :rowsPerPageOptions="[5, 10, 20]"
-      filterDisplay="menu"
       :loading="loading"
-      :globalFilterFields="['title']"
+      :globalFilterFields="['title', 'category']"
     >
-      <template #header>
+      <!-- <template #header>
         <div class="flex justify-content-between">
           <Button
             type="button"
@@ -31,7 +31,7 @@
             />
           </span>
         </div>
-      </template>
+      </template> -->
       <template #empty> No products found. </template>
       <template #loading> Loading products data. Please wait. </template>
       <Column
@@ -52,8 +52,23 @@
       <Column field="price" header="Precio"></Column>
       <Column field="category" header="Categoría"></Column>
       <Column header="Acciones">
-        <template #body="rowData">
-          <Button @click="addToCart(rowData)">Agregar al Carrito</Button>
+        <template #body="slotProps">
+          <Button
+            @click="addToCart(slotProps.data)"
+            v-if="!isProductInCart(slotProps.data.id)"
+            >Add to cart</Button
+          >
+          <div v-else>
+            <Button
+              @click="removeItem(slotProps.data.id)"
+              icon="pi pi-minus"
+            ></Button>
+            <span>{{ getCartItemQuantity(slotProps.data.id) }}</span>
+            <Button
+              @click="addToCart(slotProps.data)"
+              icon="pi pi-plus"
+            ></Button>
+          </div>
         </template>
       </Column>
     </DataTable>
@@ -61,32 +76,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from "primevue/button";
-import InputText from "primevue/inputtext";
-import { FilterMatchMode } from "primevue/api";
+/* import Skeleton from "primevue/skeleton"; */
+/* import InputText from "primevue/inputtext"; */
+/* import { FilterMatchMode } from "primevue/api"; */
 
-// Definir el estado local para la lista de productos
+// Recibe los filtros como prop
+const props = defineProps(["filters", "cartProducts"]);
+
 const products = ref([]);
-
-// Definir el estado local para los filtros
-const filters = ref({
-  global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  title: { value: null, matchMode: FilterMatchMode.CONTAINS },
-});
-
-// Definir el estado local para la propiedad loading
 const loading = ref(true);
 
-// Función para agregar un producto al carrito
-const addToCart = (product) => {
-  // Lógica para agregar el producto al carrito (puedes implementar esto según tus necesidades)
-  console.log("Producto agregado al carrito:", product);
-};
-
-// Llamada a la API para obtener la lista de productos
 onMounted(async () => {
   try {
     const response = await fetch("https://fakestoreapi.com/products");
@@ -102,17 +105,34 @@ onMounted(async () => {
   } catch (error) {
     console.error("Error al obtener datos de la API:", error.message);
   } finally {
-    // Establecer loading en false después de que se complete la carga
     loading.value = false;
   }
 });
 
-// Función para limpiar los filtros
-const clearFilter = () => {
-  filters.value = {
-    global: { value: null, matchMode: FilterMatchMode.CONTAINS },
-    title: { value: null, matchMode: FilterMatchMode.CONTAINS },
-  };
+const updateFilters = (value) => {
+  // Emitir el evento update:filters al cambiar los filtros
+  props.emit("update:filters", value);
+};
+
+const emits = defineEmits(["add-product", "remove-item"]);
+
+const addToCart = (product) => {
+  emits("add-product", product);
+};
+
+const removeItem = (productId) => {
+  emits("remove-item", productId);
+};
+
+const isProductInCart = (productId) => {
+  return props.cartProducts.some((item) => item.product.id === productId);
+};
+
+const getCartItemQuantity = (productId) => {
+  const cartItem = props.cartProducts.find(
+    (item) => item.product.id === productId
+  );
+  return cartItem ? cartItem.items : 0;
 };
 </script>
 
