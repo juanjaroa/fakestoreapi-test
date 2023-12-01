@@ -1,7 +1,14 @@
-# Vue 3 + Vite
+# FakeStoreAPI - Test
 
-This template should help get you started developing with Vue 3 in Vite. The template uses Vue 3 `<script setup>` SFCs, check out the [script setup docs](https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup) to learn more.
+Este proyecto es una aplicación de muestra desarrollada en Vue con Vite, haciendo uso de PrimeVue y la API fakeStore. Se trata de una aplicación de página única (SPA) que presenta un listado de productos con funcionalidades como búsqueda por nombre, filtrado por categorías, y la posibilidad de agregar productos al carrito. Además, la aplicación permite ajustar las cantidades de los productos en el carrito, mostrando el subtotal y el total con opción de envío.
 
-## Recommended IDE Setup
+## Características
 
-- [VS Code](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+- **Vue y Vite:** Utilización de Vue.js como framework de desarrollo y Vite para la configuración del proyecto, lo que garantiza un rendimiento óptimo.
+- **PrimeVue:** Integración de PrimeVue para la interfaz de usuario, proporcionando componentes ricos y una experiencia de usuario agradable.
+
+- **API fakeStore:** Consumo de la API fakeStore para obtener datos de productos y simular un entorno de comercio electrónico.
+
+- **Funcionalidades de búsqueda y filtro:** Posibilidad de buscar productos por nombre y filtrarlos por categorías, mejorando la experiencia del usuario.
+
+- **Carrito de compras:** Implementación de un carrito de compras que permite agregar productos, ajustar cantidades y calcular el subtotal y total con envío.
