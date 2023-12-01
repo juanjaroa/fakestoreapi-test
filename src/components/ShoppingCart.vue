@@ -2,7 +2,7 @@
   <DataView :value="products">
     <template #empty>
       <div>
-        <i class="pi pi-info-circle"></i>
+        <i class="pi pi-info-circle" style="color: var(--red-300)"></i>
         You haven't selected any products yet.
       </div>
     </template>
