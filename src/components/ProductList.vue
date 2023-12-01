@@ -25,13 +25,9 @@
           header="Name"
           :filter="true"
           filterMatchMode="contains"
-          style="max-width: 350px; min-width: 200px"
+          style="max-width: 300px; min-width: 200px"
         ></Column>
-        <Column
-          header="Image"
-          style="text-align: center"
-          headerStyle="text-align: center"
-        >
+        <Column header="Image" style="text-align: center">
           <template #body="slotProps">
             <img
               :src="slotProps.data.image"
@@ -40,8 +36,12 @@
             />
           </template>
         </Column>
-        <Column field="category" header="Category"></Column>
-        <Column field="price" header="Price">
+        <Column
+          field="category"
+          header="Category"
+          style="width: 220px"
+        ></Column>
+        <Column field="price" header="Price" style="width: 120px">
           <template #body="slotProps">
             <span style="font-weight: 600; color: var(--highlight-text-color)"
               >${{ slotProps.data.price }}</span
