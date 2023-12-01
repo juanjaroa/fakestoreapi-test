@@ -1,77 +1,81 @@
 <template>
   <div>
-    <h2>Productos</h2>
-    <p>Aquí se muestran todos los productos disponibles:</p>
+    <header>
+      <h1>Products</h1>
+      <CategoryList @update:categoryValue="handleCategoryUpdate" />
+    </header>
 
-    <!-- Mostrar la lista de productos usando PrimeVue's DataTable -->
-    <DataTable
-      :filters="filters"
-      @update:filters="updateFilters"
-      :value="products"
-      paginator
-      :rows="5"
-      :rowsPerPageOptions="[5, 10, 20]"
-      :loading="loading"
-      :globalFilterFields="['title', 'category']"
-    >
-      <!-- <template #header>
-        <div class="flex justify-content-between">
-          <Button
-            type="button"
-            icon="pi pi-filter-slash"
-            label="Clear"
-            outlined
-            @click="clearFilter()"
-          ></Button>
-          <span class="p-input-icon-left">
-            <i class="pi pi-search"></i>
-            <InputText
-              v-model="filters['global'].value"
-              placeholder="Keyword Search"
+    <div class="card">
+      <DataTable
+        :filters="filters"
+        @update:filters="updateFilters"
+        :value="products"
+        paginator
+        :rows="5"
+        :rowsPerPageOptions="[5, 10, 20]"
+        :loading="loading"
+        :globalFilterFields="['title', 'category']"
+        size="large"
+        stripedRows
+      >
+        <template #empty> No products found. </template>
+        <template #loading> Loading products data. Please wait. </template>
+        <Column
+          field="title"
+          header="Name"
+          :filter="true"
+          filterMatchMode="contains"
+          style="max-width: 350px; min-width: 200px"
+        ></Column>
+        <Column
+          header="Image"
+          style="text-align: center"
+          headerStyle="text-align: center"
+        >
+          <template #body="slotProps">
+            <img
+              :src="slotProps.data.image"
+              :alt="slotProps.data.image"
+              class="product-image"
             />
-          </span>
-        </div>
-      </template> -->
-      <template #empty> No products found. </template>
-      <template #loading> Loading products data. Please wait. </template>
-      <Column
-        field="title"
-        header="Título"
-        :filter="true"
-        filterMatchMode="contains"
-      ></Column>
-      <Column header="Image">
-        <template #body="slotProps">
-          <img
-            :src="slotProps.data.image"
-            :alt="slotProps.data.image"
-            class="product-image"
-          />
-        </template>
-      </Column>
-      <Column field="price" header="Precio"></Column>
-      <Column field="category" header="Categoría"></Column>
-      <Column header="Acciones">
-        <template #body="slotProps">
-          <Button
-            @click="addToCart(slotProps.data)"
-            v-if="!isProductInCart(slotProps.data.id)"
-            >Add to cart</Button
-          >
-          <div v-else>
+          </template>
+        </Column>
+        <Column field="category" header="Category"></Column>
+        <Column field="price" header="Price">
+          <template #body="slotProps">
+            <span style="font-weight: 600; color: var(--highlight-text-color)"
+              >${{ slotProps.data.price }}</span
+            >
+          </template>
+        </Column>
+        <Column>
+          <template #body="slotProps">
             <Button
-              @click="removeItem(slotProps.data.id)"
-              icon="pi pi-minus"
-            ></Button>
-            <span>{{ getCartItemQuantity(slotProps.data.id) }}</span>
-            <Button
+              size="small"
               @click="addToCart(slotProps.data)"
-              icon="pi pi-plus"
-            ></Button>
-          </div>
-        </template>
-      </Column>
-    </DataTable>
+              v-if="!isProductInCart(slotProps.data.id)"
+              >Add to cart</Button
+            >
+            <div class="add-remove" v-else>
+              <Button
+                size="small"
+                text
+                severity="danger"
+                @click="removeItem(slotProps.data.id)"
+                icon="pi pi-minus"
+              ></Button>
+              <h4>{{ getCartItemQuantity(slotProps.data.id) }}</h4>
+              <Button
+                size="small"
+                text
+                @click="addToCart(slotProps.data)"
+                icon="pi pi-plus"
+              ></Button>
+            </div>
+          </template>
+        </Column>
+      </DataTable>
+    </div>
   </div>
 </template>
 
@@ -80,15 +84,16 @@ import { ref, onMounted, computed } from "vue";
 import DataTable from "primevue/datatable";
 import Column from "primevue/column";
 import Button from "primevue/button";
-/* import Skeleton from "primevue/skeleton"; */
-/* import InputText from "primevue/inputtext"; */
-/* import { FilterMatchMode } from "primevue/api"; */
+import CategoryList from "./CategoryList.vue";
 
-// Recibe los filtros como prop
 const props = defineProps(["filters", "cartProducts"]);
 
 const products = ref([]);
 const loading = ref(true);
+
+const handleCategoryUpdate = (category) => {
+  props.filters.category.value = category;
+};
 
 onMounted(async () => {
   try {
@@ -110,7 +115,6 @@ onMounted(async () => {
 });
 
 const updateFilters = (value) => {
-  // Emitir el evento update:filters al cambiar los filtros
   props.emit("update:filters", value);
 };
 
@@ -137,8 +141,25 @@ const getCartItemQuantity = (productId) => {
 </script>
 
 <style scoped>
-/* Estilos específicos para este componente si es necesario */
+header {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
 .p-datatable .product-image {
-  width: 6rem;
+  height: 100px;
+  aspect-ratio: 1/1;
+  object-fit: contain;
+}
+button {
+  width: max-content;
+}
+
+.card {
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  border-radius: 0.5rem;
+  overflow: hidden;
 }
 </style>

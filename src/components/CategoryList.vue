@@ -1,18 +1,18 @@
 <template>
   <div class="category-filter">
-    <p>Filter by:</p>
-    <SelectButton
-      size="small"
+    <Dropdown
       v-model="categoryValue"
       :options="categories"
       :optionLabel="(option) => option"
-      aria-labelledby="basic"
+      showClear
+      placeholder="Select a Category"
     />
   </div>
 </template>
 <script setup>
 import { ref, onMounted, watch } from "vue";
-import SelectButton from "primevue/selectbutton";
+
+import Dropdown from "primevue/dropdown";
 
 const categories = ref([]);
 
@@ -36,9 +36,7 @@ onMounted(async () => {
     categories.value = data;
   } catch (error) {
     console.error("Error la lista de categorias de productos:", error.message);
-  } /* finally {
-    loading.value = false;
-  } */
+  }
 });
 
 watch(categoryValue, () => {
@@ -49,8 +47,6 @@ watch(categoryValue, () => {
 .category-filter {
   display: flex;
   align-items: center;
-
   gap: 1rem;
-  flex-wrap: wrap;
 }
 </style>

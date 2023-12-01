@@ -1,13 +1,45 @@
-
-
-#app {
+body{
+  margin: 0;
+}
+.container {
   max-width: 1280px;
   margin: 0 auto;
   padding: 2rem;
-  text-align: center;
 }
 
-p, h2{
+p, h1, h2, h4{
   margin: 0;
 }
 
+.p-menubar {
+  gap: 1rem;
+  
+}
+.p-menubar-start,
+.p-menubar-end{
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+.truncate {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.add-remove {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+.p-button-icon-only {
+  padding: 0.25rem 0.5rem;
+}
+.p-sidebar-content{
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.p-button.cart{
+  padding: 0.75rem 1rem;
+}

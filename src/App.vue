@@ -1,33 +1,54 @@
 <template>
-  <div class="sections">
-    <Button icon="pi pi-arrow-left" @click="showSidebar = true"></Button>
-    <SearchBar @search="handleSearch" />
-    <CategoryList @update:categoryValue="handleCategoryUpdate" />
+  <Menubar>
+    <template #start>
+      <i
+        class="pi pi-prime"
+        style="font-size: 2rem; color: var(--highlight-text-color)"
+      ></i>
+      <SearchBar @search="handleSearch" />
+    </template>
+    <template #end>
+      <Button
+        icon="pi pi-shopping-cart"
+        :badge="cartProducts.length > 0 ? cartProducts.length.toString() : null"
+        @click="showSidebar = true"
+        class="cart"
+      ></Button>
+    </template>
+  </Menubar>
+  <div class="container">
     <ProductList
       :filters="filters"
       :cartProducts="cartProducts"
       @add-product="handleAddCart"
       @remove-item="handleRemoveItem"
     />
-    <Sidebar v-model:visible="showSidebar" header="Cart items" position="right">
-      <ShoppingCart :products="cartProducts" @remove-item="handleRemoveItem" />
-    </Sidebar>
   </div>
+  <Sidebar
+    v-model:visible="showSidebar"
+    header="Cart items"
+    position="right"
+    blockScroll
+  >
+    <ShoppingCart
+      :products="cartProducts"
+      @add-product="handleAddCart"
+      @remove-item="handleRemoveItem"
+    />
+  </Sidebar>
 </template>
 
 <script setup>
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import { FilterMatchMode } from "primevue/api";
 
+import Menubar from "primevue/menubar";
 import SearchBar from "./components/SearchBar.vue";
-import CategoryList from "./components/CategoryList.vue";
 import ProductList from "./components/ProductList.vue";
 import ShoppingCart from "./components/ShoppingCart.vue";
-
 import Sidebar from "primevue/sidebar";
 import Button from "primevue/button";
 
-// Define los filtros en App.vue
 const filters = ref({
   global: { value: null, matchMode: FilterMatchMode.CONTAINS },
   title: { value: null, matchMode: FilterMatchMode.CONTAINS },
@@ -37,15 +58,14 @@ const filters = ref({
 const showSidebar = ref(false);
 
 const handleSearch = (searchTerm) => {
-  // Actualizar el filtro global con el término de búsqueda
   filters.value.global.value = searchTerm;
 };
 
-const handleCategoryUpdate = (category) => {
-  filters.value.category.value = category;
-};
+const CART_PRODUCTS_KEY = "cartProducts";
 
-const cartProducts = ref([]);
+const cartProducts = ref(
+  JSON.parse(sessionStorage.getItem(CART_PRODUCTS_KEY)) || []
+);
 
 const handleAddCart = (product) => {
   // Buscar si el producto ya está en el carrito
@@ -60,6 +80,8 @@ const handleAddCart = (product) => {
     // Si el producto no está en el carrito, agregarlo con items = 1
     cartProducts.value = [...cartProducts.value, { product, items: 1 }];
   }
+
+  sessionStorage.setItem(CART_PRODUCTS_KEY, JSON.stringify(cartProducts.value));
 };
 
 const handleRemoveItem = (productId) => {
@@ -77,23 +99,9 @@ const handleRemoveItem = (productId) => {
       cartProducts.value.splice(index, 1);
     }
   }
-};
 
-watch(
-  cartProducts,
-  () => {
-    console.log(cartProducts.value);
-  },
-  { deep: true }
-);
+  sessionStorage.setItem(CART_PRODUCTS_KEY, JSON.stringify(cartProducts.value));
+};
 </script>
 
-<style scoped>
-.sections {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  gap: 2rem;
-}
-</style>
+<style scoped></style>
